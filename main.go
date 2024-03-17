@@ -5,15 +5,18 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 )
 
 var (
-	images = []string{".jpeg", ".jpg", ".png"}
-	reads  = []string{".docx", ".pdf"}
+	images = []string{".jpeg", ".jpg", ".png", ".svg", ".gif"}
+	reads  = []string{".docx", ".pdf", ".md", ".txt", ".pptx"}
 	sheets = []string{".xlsx", ".csv"}
+	media  = []string{".mp3", ".mp4"}
 )
 
 func main() {
+	t := time.Now()
 	d, err := os.ReadDir("./")
 	if err != nil {
 		panic(err)
@@ -47,10 +50,22 @@ func main() {
 			if err := moveFile(file.Name(), dst); err != nil {
 				fmt.Println(err)
 			}
+		case containsAny(lowerCaseFileName, media):
+			if err := os.MkdirAll("MEDIA", os.ModeAppend); err != nil {
+				fmt.Println(err)
+			}
+			dst := fmt.Sprintf("./MEDIA/%s", file.Name())
+			if err := moveFile(file.Name(), dst); err != nil {
+				fmt.Println(err)
+			}
 		default:
 			fmt.Println("Undefined File")
 		}
 	}
+
+	duration := time.Since(t)
+	fmt.Println(duration)
+	time.Sleep(3 * time.Second)
 }
 
 func moveFile(source, dst string) error {
